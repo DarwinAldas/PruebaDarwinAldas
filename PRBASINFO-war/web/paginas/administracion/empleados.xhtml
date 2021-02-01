@@ -22,13 +22,13 @@
                                 <p:message for="empIdentif"/>
 
                                 <p:outputLabel value="Nombres:" style="font-size:13px;" />
-                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empNom" value="#{gesEmpleadoControlador.empleadoActual.empNombre}"  
-                                             maxlength="50" required="true"  />
+                                <p:inputText   size="20" id="empNom" value="#{gesEmpleadoControlador.empleadoActual.empNombre}"  
+                                               maxlength="50" required="true" onkeyup="$(this).val($(this).val().replace(/[^a-z _-]/gi, ''));value = value.toUpperCase()"  />
                                 <p:message for="empNom"/>
 
                                 <p:outputLabel value="Apellidos:" style="font-size:13px;" />
-                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empApe" value="#{gesEmpleadoControlador.empleadoActual.empApellido}"  
-                                             maxlength="50" required="true"  />
+                                <p:inputText   size="20" id="empApe" value="#{gesEmpleadoControlador.empleadoActual.empApellido}"  
+                                               maxlength="50" required="true"  onkeyup="$(this).val($(this).val().replace(/[^a-z _-]/gi, ''));value = value.toUpperCase()" />
                                 <p:message for="empApe"/>
 
 
@@ -43,7 +43,7 @@
 
                                 <p:outputLabel value="Dirección:" style="font-size:13px;" />
                                 <p:inputTextarea onkeyup="value = value.toUpperCase()"   id="empDirec" value="#{gesEmpleadoControlador.empleadoActual.empDireccion}"  
-                                                 maxlength="20" required="true"  />
+                                                 maxlength="150" required="true"  />
                                 <p:message for="empDirec"/>
 
                                 <p:outputLabel value="Fono Contacto:" style="font-size:13px;" />
@@ -53,14 +53,15 @@
 
                                 <p:outputLabel value="Mail:" style="font-size:13px;" />
                                 <p:inputText   size="30" id="empMail" value="#{gesEmpleadoControlador.empleadoActual.empCorreoElectronico}"  
-                                               maxlength="50" required="true"  />
+                                               maxlength="50"    />
                                 <p:message for="empMail"/>
 
 
+                                <p:outputLabel value="Fecha de nacimiento:(dd/MM/YYYY)" style="font-size:13px;" />                         
+                                <h:inputText id="empFecNac" required="true" value="#{gesEmpleadoControlador.empleadoActual.empFechaNac}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:inputText>
 
-                                <p:outputLabel value="Fecha de nacimiento:" style="font-size:13px;" />
-                                <p:calendar id="empFecNac" value="#{gesEmpleadoControlador.empleadoActual.empFechaNac}" pattern="dd/MM/yyyy">
-                                </p:calendar>
                                 <p:message for="empFecNac"/>
 
                                 <p:outputLabel value="Departamento:" style="font-size:13px;" />  
@@ -114,9 +115,9 @@
                                                  async="true" global="false"></p:commandButton>
 
 
-
-                                <h:column></h:column>
                                 <center>
+                                    <h:column></h:column>
+                                    <h:column></h:column>
                                     <h:panelGrid columns="3" id="pnlConBotTRansaccion">
                                         <p:commandButton style="font-size:13px;" value="#{txt.guardar_btn}" 
                                                          id="btnGuardar" 
@@ -140,7 +141,6 @@
                                     </h:panelGrid>
                                 </center>
                             </h:panelGrid>   
-
                         </p:panel>
                     </h:panelGrid>
 
@@ -171,7 +171,7 @@
                                     <p:selectOneMenu id="empEmpleadoSup"  panelStyle="width:305px" converter="empleadoConverter" value="#{gesEmpleadoControlador.empleadoSupActual}" required="true"  requiredMessage="Empleado necesita ser seleccionado"
                                                      effect="fade" var="item" filter="true" filterMatchMode="contains">                                        
                                         <f:selectItem itemLabel="Seleccione uno" itemValue="" />
-                                        <f:selectItems value="#{gesEmpleadoControlador.listaEmpleado}" var="emp" itemLabel="#{emp.empNombre} #{emp.empApellido} - #{emp.codCargo.carNombre}"   />
+                                        <f:selectItems value="#{gesEmpleadoControlador.listaEmpleadoSup}" var="emp" itemLabel="#{emp.empNombre} #{emp.empApellido} - #{emp.codCargo.carNombre}"   />
                                         <p:column style="width:10%">
                                             <h:outputText value="#{item.idEmpleado}" />
                                         </p:column>
@@ -281,6 +281,9 @@
                                 </p:column>
                                 <p:column    headerText="Salario" width="60" style="font-size:12px;">
                                     <h:outputText value="#{empColumna.empSalario}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column   headerText="Superior" width="200" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.codEmpleadoPadre.empNombre} #{empColumna.codEmpleadoPadre.empApellido}" style="font-size:12px;" />
                                 </p:column>
 
 
