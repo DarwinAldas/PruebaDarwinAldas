@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -98,33 +100,40 @@ public class GesEmpleadoControlador extends BaseControlador {
     public void guardarEmpleado() {
         try {
             if (editaEmpleado == false) {
-
                 if (empleadoServicio.existeIdentificadorEmpleado(empleadoActual.getEmpIdentificador())) {
                     addWarningMessage("El identificador ingresado ya existe en la base", "");
                 } else {
+
+                   if (controlaMismoDepartamento() && controlaJerarquiaEmpleado()) {
                     empleadoActual.setEstadoLogico(true);
                     empleadoActual.setCodDepartamento(departamentoActual);
                     empleadoActual.setCodCargo(cargoActual);
                     Timestamp fec1 = new Timestamp(fechaActual.getTime());
                     empleadoActual.setEmpFechaRegistro(fec1);
                     empleadoServicio.crearEmpleado(empleadoActual);
+                    verificaEstructuraMail();
                     guardarHistorialSalarioInicial();
                     addSuccessMessage("Registro Guardado", "");
                     listarEmpleados();
                     refrescarObjEmpleado();
+                      }
+                }
+            } else {
+
+                if (controlaMismoDepartamento() && controlaJerarquiaEmpleado()) {
+                    empleadoActual.setCodDepartamento(departamentoActual);
+                    empleadoActual.setCodCargo(cargoActual);
+                    Timestamp fec1 = new Timestamp(fechaActual.getTime());
+                    empleadoActual.setEmpFechaActualiza(fec1);
+                    empleadoServicio.editarEmpleado(empleadoActual);
+                    verificaEstructuraMail();
+                    addSuccessMessage("Registro Actualizado", "");
+                    listarEmpleados();
+                    editaEmpleado = false;
+                    empleadoActual = null;
+                    refrescarObjEmpleado();
                 }
 
-            } else {
-                empleadoActual.setCodDepartamento(departamentoActual);
-                empleadoActual.setCodCargo(cargoActual);
-                Timestamp fec1 = new Timestamp(fechaActual.getTime());
-                empleadoActual.setEmpFechaActualiza(fec1);
-                empleadoServicio.editarEmpleado(empleadoActual);
-                addSuccessMessage("Registro Actualizado", "");
-                listarEmpleados();
-                editaEmpleado = false;
-                empleadoActual = null;
-                refrescarObjEmpleado();
             }
 
         } catch (Exception e) {
@@ -184,9 +193,9 @@ public class GesEmpleadoControlador extends BaseControlador {
             departamentoActual = departamentoServicio.buscarPorIdDepartamento(empleadoActual.getCodDepartamento().getIdDepartamento());
             cargoActual = cargoServicio.buscarPorIdCargo(empleadoActual.getCodCargo().getIdCargo());
             listarCargoPorDepartamento();
-            System.out.println("Objeto Cargo:" + cargoActual.getCarNombre());
             if (empleadoActual.getCodEmpleadoPadre() != null) {
                 nomEmpleadoSuperior = empleado.getCodEmpleadoPadre().getEmpNombre() + " " + empleado.getCodEmpleadoPadre().getEmpApellido();
+                empleadoSupActual=empleadoActual.getCodEmpleadoPadre();
             } else {
                 nomEmpleadoSuperior = "";
             }
@@ -258,10 +267,81 @@ public class GesEmpleadoControlador extends BaseControlador {
             objEmpleadoAux = empleadoServicio.buscarPorIdEmpleado(empleadoSupActual.getIdEmpleado());
             nomEmpleadoSuperior = objEmpleadoAux.getEmpNombre() + " " + objEmpleadoAux.getEmpApellido();
             empleadoActual.setCodEmpleadoPadre(objEmpleadoAux);
-            objEmpleadoAux = null;
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, null, e);
         }
+    }
+
+    public void verificaEstructuraMail() {
+        try {
+            if (!empleadoActual.getEmpCorreoElectronico().equals("") && empleadoActual.getEmpCorreoElectronico().trim().length() != 0) {
+                Pattern pattern = Pattern
+                        .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+                // El email a validar
+                String email = empleadoActual.getEmpCorreoElectronico();
+                Matcher mather = pattern.matcher(email);
+                if (mather.find() == true) {
+                } else {
+                    addWarningMessage("El email ingresado es inválido.");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+    }
+
+    public boolean controlaMismoDepartamento() {
+        boolean mismoDepartamento = true;
+        try {
+            if (!nomEmpleadoSuperior.equals("")) {
+                   Empleado objEmpleadoAux = new Empleado();
+                    objEmpleadoAux = empleadoServicio.buscarPorIdEmpleado(empleadoSupActual.getIdEmpleado());
+                if (departamentoActual != null && objEmpleadoAux.getCodDepartamento() != null) {
+                    if (departamentoActual.getIdDepartamento() == objEmpleadoAux.getCodDepartamento().getIdDepartamento()) {
+                        mismoDepartamento = true;
+                    } else {
+                        mismoDepartamento = false;
+                        addErrorMessage("EL empleado y su superior deben pertenecer al mismo departamento");
+                    }
+                }
+            } else {
+                mismoDepartamento = true;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        return mismoDepartamento;
+    }
+
+    public boolean controlaJerarquiaEmpleado() {
+        boolean jerarquiaCorrecta = true;
+        System.out.println("cargoActual:" + cargoActual.getIdCargo());
+        System.out.println("cargoActual nivel:" + cargoActual.getCarNivel());
+
+        try {
+            if (!nomEmpleadoSuperior.equals("")) {
+                 Empleado objEmpleadoAux = new Empleado();
+                    objEmpleadoAux = empleadoServicio.buscarPorIdEmpleado(empleadoSupActual.getIdEmpleado());
+                if (cargoActual != null && empleadoSupActual != null) {                   
+                    Cargo objCargoAux = new Cargo();
+                    objCargoAux = cargoServicio.buscarPorIdCargo(cargoActual.getIdCargo());
+                    if (objCargoAux.getCarNivel() > objEmpleadoAux.getCodCargo().getCarNivel()) {
+                        jerarquiaCorrecta = true;
+                    } else {
+                        jerarquiaCorrecta = false;
+                        addErrorMessage("El empleado a quien reporta debe tener una jerarquia superior");
+                    }
+                }
+            } else {
+                jerarquiaCorrecta = true;
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        return jerarquiaCorrecta;
     }
 
     public void onDateSelect(SelectEvent event) {
