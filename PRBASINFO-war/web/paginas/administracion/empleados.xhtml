@@ -1,0 +1,312 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:composition template="/plantillas/own_plantilla.xhtml">
+        <ui:define name="contenido">
+            <h:form id="frmEmpleado">  
+                <p:growl id="msgs" showDetail="true"/>
+                <center>
+                    <h:panelGrid id="panelDatEmpleado" columns="2">
+                        <!--Fomrulario ingreso de datos-->
+                        <p:panel header="Registro de empleados">
+                            <h:panelGrid columns="3" >
+                                <p:outputLabel value="Identificador:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empIdentif" value="#{gesEmpleadoControlador.empleadoActual.empIdentificador}"  
+                                             maxlength="20" required="true"  />
+                                <p:message for="empIdentif"/>
+
+                                <p:outputLabel value="Nombres:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empNom" value="#{gesEmpleadoControlador.empleadoActual.empNombre}"  
+                                             maxlength="50" required="true"  />
+                                <p:message for="empNom"/>
+
+                                <p:outputLabel value="Apellidos:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empApe" value="#{gesEmpleadoControlador.empleadoActual.empApellido}"  
+                                             maxlength="50" required="true"  />
+                                <p:message for="empApe"/>
+
+
+
+                                <p:outputLabel value="Sexo:" style="font-size:13px;"/>
+                                <p:selectOneMenu id="empSexo" value="#{gesEmpleadoControlador.empleadoActual.empSexo}" style="width:150px">
+                                    <f:selectItem itemLabel="Seleccione.." itemValue="0" />
+                                    <f:selectItem itemLabel="HOMBRE" itemValue="H" />
+                                    <f:selectItem itemLabel="MUJER" itemValue="M" />  
+                                </p:selectOneMenu>
+                                <p:message for="empSexo"/>
+
+                                <p:outputLabel value="Dirección:" style="font-size:13px;" />
+                                <p:inputTextarea onkeyup="value = value.toUpperCase()"   id="empDirec" value="#{gesEmpleadoControlador.empleadoActual.empDireccion}"  
+                                                 maxlength="20" required="true"  />
+                                <p:message for="empDirec"/>
+
+                                <p:outputLabel value="Fono Contacto:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empContacto" value="#{gesEmpleadoControlador.empleadoActual.empFonoContacto}"  
+                                             maxlength="20" required="true"  />
+                                <p:message for="empContacto"/>
+
+                                <p:outputLabel value="Mail:" style="font-size:13px;" />
+                                <p:inputText   size="30" id="empMail" value="#{gesEmpleadoControlador.empleadoActual.empCorreoElectronico}"  
+                                               maxlength="50" required="true"  />
+                                <p:message for="empMail"/>
+
+
+
+                                <p:outputLabel value="Fecha de nacimiento:" style="font-size:13px;" />
+                                <p:calendar id="empFecNac" value="#{gesEmpleadoControlador.empleadoActual.empFechaNac}" pattern="dd/MM/yyyy">
+                                </p:calendar>
+                                <p:message for="empFecNac"/>
+
+                                <p:outputLabel value="Departamento:" style="font-size:13px;" />  
+                                <p:selectOneMenu id="empDepartamento"  panelStyle="width:305px" converter="departamentoConverter" value="#{gesEmpleadoControlador.departamentoActual}" required="true"  requiredMessage="Departamento necesita ser seleccionado"
+                                                 effect="fade" var="item" filter="true" filterMatchMode="contains">
+                                    <p:ajax listener="#{gesEmpleadoControlador.listarCargoPorDepartamento()}" update="empCargo" />
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                    <f:selectItems value="#{gesEmpleadoControlador.listaDepartamento}" var="dep" itemLabel="#{dep.depNombre}"   />
+                                    <p:column style="width:10%">
+                                        <h:outputText value="#{item.idDepartamento}" />
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{item.depNombre}  " />
+                                    </p:column>
+                                </p:selectOneMenu>
+                                <p:message for="empDepartamento" display="icon"/>  
+
+
+                                <p:outputLabel value="Cargo:" style="font-size:13px;" />  
+                                <p:selectOneMenu id="empCargo"  panelStyle="width:305px" converter="cargoConverter" value="#{gesEmpleadoControlador.cargoActual}" required="true"  requiredMessage="Cargo necesita ser seleccionado"
+                                                 effect="fade" var="item" filter="true" filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                    <f:selectItems value="#{gesEmpleadoControlador.listaCargo}" var="car" itemLabel="#{car.carNombre}"   />
+                                    <p:column style="width:10%">
+                                        <h:outputText value="#{item.idCargo}" />
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{item.carNombre}  " />
+                                    </p:column>
+                                </p:selectOneMenu>
+                                <p:message for="empCargo" display="icon"/>  
+
+
+                                <p:outputLabel value="Salario:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empSalario" disabled="#{gesEmpleadoControlador.editaSueldo}" value="#{gesEmpleadoControlador.empleadoActual.empSalario}"  
+                                             maxlength="20" required="true"  />
+                                <p:column>
+                                    <p:message for="empSalario"/>
+                                    <p:commandButton rendered="#{gesEmpleadoControlador.editaEmpleado==true and gesEmpleadoControlador.usuarioActual.equals('mandrade')}" icon="ui-icon-pencil" value="Actualizar Sueldo"   
+                                                     onclick="PF('panelActSueldo').show();" process="@this" 
+                                                     update=":frmEmpleado:pnlActSueldo"
+                                                     async="true" global="false"></p:commandButton>
+                                </p:column>
+
+                                <p:outputLabel value="Reporta a:" style="font-size:13px;" />
+                                <p:inputText onkeyup="value = value.toUpperCase()" size="40" id="empSup" disabled="true" value="#{gesEmpleadoControlador.nomEmpleadoSuperior}"  
+                                             maxlength="20" required="true"  />
+                                <p:commandButton icon="ui-icon-pencil" value="Agregar Personal" action="#{gesEmpleadoControlador.cargarEmpleadoNivelSuperior()}" 
+                                                 onclick="PF('panelEmpSuperior').show();" process="@this" 
+                                                 update=":frmEmpleado:pnlEmpeGerarquico"
+                                                 async="true" global="false"></p:commandButton>
+
+
+
+                                <h:column></h:column>
+                                <center>
+                                    <h:panelGrid columns="3" id="pnlConBotTRansaccion">
+                                        <p:commandButton style="font-size:13px;" value="#{txt.guardar_btn}" 
+                                                         id="btnGuardar" 
+                                                         action="#{gesEmpleadoControlador.guardarEmpleado()}" 
+                                                         icon="ui-icon-disk"  
+                                                         process="@this,panelDatEmpleado" 
+                                                         update=":frmEmpleado,panelDatEmpleado,panelEmpleadoList "
+                                                         async="true"
+                                                         global="false"
+                                                         />
+                                        <p:commandButton style="font-size:13px;" value="#{txt.nuevo_btn}" 
+                                                         id="btnNuevo" 
+                                                         action="#{gesEmpleadoControlador.refrescarObjEmpleado()}" 
+                                                         icon="ui-icon-document"  
+                                                         process="@this,panelDatEmpleado" 
+                                                         update=":frmEmpleado,panelDatEmpleado "
+                                                         async="true"
+                                                         global="false"
+                                                         />
+
+                                    </h:panelGrid>
+                                </center>
+                            </h:panelGrid>   
+
+                        </p:panel>
+                    </h:panelGrid>
+
+
+
+
+                    <p:dialog  widgetVar="panelEmpSuperior"   height="300" width="600">                                            
+                        <p:panel header="Empleados" style="font-size: 14px">
+                            <center>
+                                <h:panelGrid columns="" border="0" id="pnlEmpeGerarquico">
+                                    <p:outputLabel value="Departamento:" style="font-size:13px;" />  
+                                    <p:selectOneMenu id="empDepartamentoSup"  panelStyle="width:305px" converter="departamentoConverter" value="#{gesEmpleadoControlador.departamentoSupActual}" required="true"  requiredMessage="Departamento necesita ser seleccionado"
+                                                     effect="fade" var="item" filter="true" filterMatchMode="contains">
+                                        <p:ajax listener="#{gesEmpleadoControlador.listarEmpleadoPorDepartamento()}" update="empEmpleadoSup" />
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItems value="#{gesEmpleadoControlador.listaDepartamento}" var="dep" itemLabel="#{dep.depNombre}"   />
+                                        <p:column style="width:10%">
+                                            <h:outputText value="#{item.idDepartamento}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{item.depNombre}  " />
+                                        </p:column>
+                                    </p:selectOneMenu>
+                                    <p:message for="empDepartamentoSup" display="icon"/>  
+
+
+                                    <p:outputLabel value="Empleados:" style="font-size:13px;" />  
+                                    <p:selectOneMenu id="empEmpleadoSup"  panelStyle="width:305px" converter="empleadoConverter" value="#{gesEmpleadoControlador.empleadoSupActual}" required="true"  requiredMessage="Empleado necesita ser seleccionado"
+                                                     effect="fade" var="item" filter="true" filterMatchMode="contains">                                        
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItems value="#{gesEmpleadoControlador.listaEmpleado}" var="emp" itemLabel="#{emp.empNombre} #{emp.empApellido} - #{emp.codCargo.carNombre}"   />
+                                        <p:column style="width:10%">
+                                            <h:outputText value="#{item.idEmpleado}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{item.empNombre} #{item.empApellido} - #{item.codCargo.carNombre} " />
+                                        </p:column>
+                                    </p:selectOneMenu>
+                                    <p:message for="empEmpleadoSup" display="icon"/>  
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="3">
+                                    <p:commandButton value="#{txt.aceptar_btn}" 
+                                                     id="btnAceptarEmpSup" 
+                                                     action="#{gesEmpleadoControlador.aceptarEmpleadoNivelSuperior()}" 
+                                                     icon="ui-icon-disk"  
+                                                     process="@this,pnlEmpeGerarquico" 
+                                                     async="true"
+                                                     global="false"
+                                                     onclick="PF('panelEmpSuperior').hide();"
+                                                     update=":frmEmpleado:empSup"
+                                                     style="font-size: 12px"
+                                                     />                                    
+                                </h:panelGrid>                                    
+                            </center>
+                        </p:panel>
+                    </p:dialog>  
+
+
+                    <p:dialog  widgetVar="panelActSueldo"   height="300" width="500">                                            
+                        <p:panel header="Actualización de Sueldo" style="font-size: 14px">
+                            <center>
+                                <h:panelGrid columns="" border="0" id="pnlActSueldo">
+                                    <p:outputLabel value="Ingrese el sueldo:" style="font-size:13px;" />
+                                    <p:inputText onkeyup="value = value.toUpperCase()" size="20" id="empHisSueldo" value="#{gesEmpleadoControlador.empSalHistoricoActual.hisSalario}"  
+                                                 maxlength="20" required="true"  />
+                                    <p:message for="empHisSueldo"/>
+
+                                    <p:outputLabel value="Ingrese una descripción" style="font-size:13px;" />
+                                    <p:inputTextarea onkeyup="value = value.toUpperCase()"   id="empHisDesc" value="#{gesEmpleadoControlador.empSalHistoricoActual.hisDescripcion}"  
+                                                     required="true"  />
+                                    <p:message for="empHisDesc"/>
+
+
+
+                                </h:panelGrid>
+
+                                <h:panelGrid columns="3">
+                                    <p:commandButton value="#{txt.guardar_btn}" 
+                                                     id="btnGuardarEmpHis" 
+                                                     action="#{gesEmpleadoControlador.guardarHistorialSalarioActualizado()}" 
+                                                     icon="ui-icon-disk"  
+                                                     process="@this,pnlActSueldo" 
+                                                     async="true"
+                                                     global="false"
+                                                     onclick="PF('panelActSueldo').hide();"
+                                                     update=":frmEmpleado:panelDatEmpleado,:frmEmpleado:msgs,:frmEmpleado,panelEmpleadoList"
+                                                     style="font-size: 12px"
+                                                     />                                    
+                                </h:panelGrid>                                    
+                            </center>
+                        </p:panel>
+                    </p:dialog>  
+
+
+                    <!-- Listado de Empledos-->
+                    <h:panelGrid id="panelEmpleadoList" columns="2">
+                        <h:panelGrid id="panelListaEmpleado" columns="1" width="150" >
+                            <p:dataTable paginator="true" rows="10" style="font-size:12px;" id="tablaListaEmpleado" value="#{gesEmpleadoControlador.listaEmpleado}"  var="empColumna"   
+                                         rowKey="#{empColumna.idEmpleado}">  
+                                <f:facet name="header">
+                                    <p:outputLabel value="Listado de empleados registrados" style="font-size:15px;"/>
+                                </f:facet>
+                                <p:column   headerText="Código" width="30" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.idEmpleado}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column filterBy="#{empColumna.empIdentificador}" headerText="Identificador" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empIdentificador}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column filterBy="#{empColumna.empNombre}"  headerText="Nombres" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empNombre}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column filterBy="#{empColumna.empApellido}"  headerText="Apellidos" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empApellido}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column   headerText="Sexo" width="20" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empSexo}" style="font-size:12px;" />
+                                </p:column>
+
+                                <p:column   headerText="Fono Contacto" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empFonoContacto}" style="font-size:12px;" />
+                                </p:column>
+
+                                <p:column   headerText="Dirección" width="200" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empDireccion}" style="font-size:12px;" />
+                                </p:column>
+
+                                <p:column   headerText="Mail" width="150" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empCorreoElectronico}" style="font-size:12px;" />
+                                </p:column>
+
+                                <p:column filterBy="#{empColumna.codDepartamento.depNombre}"  headerText="Departamento" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.codDepartamento.depNombre}" style="font-size:12px;" />
+                                </p:column>
+
+                                <p:column filterBy="#{empColumna.codCargo.carNombre}"  headerText="Cargo" width="100" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.codCargo.carNombre}" style="font-size:12px;" />
+                                </p:column>
+                                <p:column    headerText="Salario" width="60" style="font-size:12px;">
+                                    <h:outputText value="#{empColumna.empSalario}" style="font-size:12px;" />
+                                </p:column>
+
+
+                                <p:column headerText="#{txt.editar_btn}" style="width:30px;text-align: center;font-size:12px;" >
+                                    <p:commandButton style="font-size:12px;" icon="ui-icon-pencil"  action="#{gesEmpleadoControlador.recuperarCamposEmpleado(empColumna)}" 
+                                                     process="@this" update=":frmEmpleado:panelDatEmpleado" async="true" global="false">
+                                    </p:commandButton>
+                                </p:column>  
+                                <p:column headerText="#{txt.eliminar_btn}" style="width:40px;text-align: center;font-size:12px;" >
+                                    <p:commandButton style="font-size:12px;" icon="ui-icon-trash"  
+                                                     actionListener="#{gesEmpleadoControlador.confirmaEliminarEmpleado(empColumna)}" 
+                                                     process="@this" update=":frmEmpleado:panelDatEmpleado,:frmEmpleado:panelEmpleadoList,:frmEmpleado:msgs,:frmEmpleado:message" async="true" global="false">
+                                        <p:confirm header="Confirmación" message="¿Está seguro de eliminar el registró?" icon="ui-icon-alert" />
+                                    </p:commandButton>
+                                </p:column> 
+                            </p:dataTable>                      
+                        </h:panelGrid>
+
+                        <p:growl id="message" showDetail="true" />
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+                    </h:panelGrid>
+                </center>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

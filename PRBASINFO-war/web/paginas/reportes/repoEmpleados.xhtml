@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+       <ui:composition template="/plantillas/own_plantilla.xhtml">
+        <ui:define name="contenido">
+            <h:form id="frmReporte">  
+                <p:growl id="msgs" showDetail="true" />
+                <center>
+                    <h:panelGrid id="panelContieneComRep" columns="2">                                           
+                        <p:panel header="Reporte de empleados total" style="font-size: 14px">                             
+                            <h:panelGrid columns="3" >                                                               
+                                <h:panelGrid columns="3" id="panelContieneBot2">
+                                    <p:commandButton   value="Generar Reporte"   icon="ui-icon-document"
+                                                       style="font-size:13px;"
+                                                       action="#{gesReportes.reporteEmpleados()}"
+                                                       oncomplete="javascript:window.open('#{facesContext.externalContext.requestContextPath}/ReporteServlet','ReporteServlet')"
+                                                       process="@all"  />  
+                                </h:panelGrid>
+                            </h:panelGrid>  
+                        </p:panel>
+
+
+                    </h:panelGrid>
+
+
+                </center>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</html>
